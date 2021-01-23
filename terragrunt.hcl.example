@@ -1,0 +1,48 @@
+include {
+  path = find_in_parent_folders()
+}
+
+locals {
+  environment_vars = read_terragrunt_config(find_in_parent_folders("env.hcl"))
+  env = local.environment_vars.locals.env
+  cloud_vars = read_terragrunt_config(find_in_parent_folders("cloud.hcl"))
+  network_id = local.cloud_vars.locals.network_id
+  dns_servers = local.cloud_vars.locals.dns_servers
+  domain_name = local.cloud_vars.locals.domain_name
+}
+
+terraform {
+  source = "git::git@github.com:avdeevi/terraform-yc-subnets-module.git"
+}
+
+inputs = {
+network_id = local.network_id
+env  = local.env
+dns_servers = local.dns_servers
+domain_name = local.domain_name
+
+subnets = {
+
+    "MySuperFolder-private-subnet1-a" = {
+      cidr        = ["10.0.10.0/24"]
+      zone        = "ru-central1-a"
+      description = "MySuperFolder private segment zone A"
+      routes      = ""
+    },
+
+    "MySuperFolder-private-subnet1-b" = {
+      cidr        = ["10.0.20.0/24"]
+      zone        = "ru-central1-b"
+      description = "MySuperFolder private segment zone B"
+      routes      = ""
+    },
+
+    "MySuperFolder-private-subnet1-c" = {
+      cidr        = ["10.0.30.0/24"]
+      zone        = "ru-central1-c"
+      description = "MySuperFolder private segment zone C"
+      routes      = ""
+    },
+  }
+}
+
